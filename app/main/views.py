@@ -27,7 +27,6 @@ user_marshaller = {
 }
 
 password_parser = reqparse.RequestParser()
-password_parser.add_argument("id")
 password_parser.add_argument("title")
 password_parser.add_argument("description")
 password_parser.add_argument("login")
@@ -54,7 +53,16 @@ class StorageApi(Resource):
 
     def post(self):
         args = password_parser.parse_args()
-        print(args)
+
+        new_password = Password(
+            title= args["title"],
+            description =args["description"],
+            login = args["login"],
+            password = args["password"],
+            url = args["url"], )
+
+        db.session.add(new_password)
+        db.session.commit()
 
     def put(self, password_id):
         pass
