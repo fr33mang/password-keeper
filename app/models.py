@@ -76,7 +76,7 @@ def load_user(user_id):
 class Password(db.Model):
     __tablename__ = 'password'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(64), unique=True)
+    title = db.Column(db.String(64))
     description = db.Column(db.String(225))
     login = db.Column(db.String(64))
     password = db.Column(db.String(64))
