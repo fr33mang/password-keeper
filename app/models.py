@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
    
-    storage = db.relationship('Password', backref='user', lazy=True)
+    storage = db.relationship('Password', cascade='all,delete', backref='user', lazy=True)
 
     @property
     def password(self):
