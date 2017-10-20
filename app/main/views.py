@@ -13,17 +13,10 @@ from . import main
 def index():
     return render_template('index.html')
 
-
-
-
 user_marshaller = {
     'id': fields.String,
     'username': fields.String,
 }
-
-class HelloWorld(Resource):
-    def get(self):
-        return { hello: "world" }
 
 class User(Resource):
     def get(self, user_id):
