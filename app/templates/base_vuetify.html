@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> {% block title %}Flasky{% endblock %}</title>
+
+
+    {% block head %}
+        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+        <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    {% endblock %}
+    
+</head>
+
+
+<body>
+
+    <div id="app">
+        <v-app id="inspire">
+            <v-navigation-drawer temporary clipped app v-model="drawer">
+                <v-list dense>
+                    <template v-for="(item, i) in items">
+                        <v-layout row v-if="item.heading" align-center :key="i">
+                            <v-flex xs6>
+                                <v-subheader v-if="item.heading">
+                                    [[ item.heading ]]
+                                </v-subheader>
+                            </v-flex>
+                            <v-flex xs6 class="text-xs-center">
+                                <a href="#!" class="body-2 black--text">EDIT</a>
+                            </v-flex>
+                        </v-layout>
+                        <v-list-group v-else-if="item.children" v-model="item.model" no-action>
+                            <v-list-tile slot="item" @click="">
+                                <v-list-tile-action>
+                                    <v-icon>[[ item.model ? item.icon : item['icon-alt'] ]]</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+                                        [[ item.text ]]
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile v-for="(child, i) in item.children" :key="i" @click="">
+                                <v-list-tile-action v-if="child.icon">
+                                    <v-icon>[[ child.icon ]]</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+                                        [[ child.text ]]
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                        </v-list-group>
+                        <v-list-tile v-else @click="">
+                            <v-list-tile-action>
+                                <v-icon>[[ item.icon ]]</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>
+                                    [[ item.text ]]
+                                </v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                    </template>
+                </v-list>
+            </v-navigation-drawer>
+            <v-toolbar color="blue darken-3" dark app clipped-left fixed>
+                <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+                    <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+                    Password keeper
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon large>
+                    <v-avatar size="32px" tile>
+                        <img src="https://vuetifyjs.com/static/doc-images/logo.svg" alt="Vuetify">
+                    </v-avatar>
+                </v-btn>
+            </v-toolbar>
+            <main>
+                <v-content>
+                    <v-container fluid class="no-padding">
+                        <v-flex hidden-xs-only>
+                            <v-layout align-center>
+                                <template>
+                                    <v-data-table v-bind:headers="headers" 
+                                                v-bind:items="passwords" 
+                                                hide-actions 
+                                                class="elevation-1">
+                                        <template slot="items" slot-scope="props">
+                                            <tr @click="showPassword([[ props.item.id ]])" >
+                                                <td>[[ props.item.title ]]</td>
+                                                <td class="text-xs-right">[[ props.item.login ]]</td>
+                                                <td class="text-xs-right">[[ props.item.password ]]</td>
+                                                <td class="text-xs-right">[[ props.item.url ]]</td>
+                                            </tr>
+                                        </template>
+                                    </v-data-table>
+                                </template>
+                            </v-layout>
+                        </v-flex>
+
+                        <v-flex hidden-sm-and-up>
+                            <v-list two-line>
+                                <template v-for="item in passwords">
+                                    <v-list-tile @click="showPassword([[ item.id ]])">
+                                        <v-list-tile-content>
+                                            <v-list-tile-title v-html="item.title"></v-list-tile-title>
+                                            <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+                                    <v-divider></v-divider>                                    
+                                </template>
+                            </v-list>
+                        </v-flex>
+                    </v-container>
+                    <template>
+                        <div class="text-xs-center">
+                            <v-bottom-sheet v-model="sheet">
+                               
+                                <v-list two-line style="position: relative;">
+                                    <v-btn top right absolute fab dark color="cyan">
+                                        <v-icon dark>edit</v-icon>
+                                    </v-btn>
+
+                                    <!--<v-btn top right absolute fab dark color="red">
+                                        <v-icon dark>delete</v-icon>
+                                    </v-btn>-->
+
+                                    <v-subheader>[[ selected.title ]]</v-subheader>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>info</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content> 
+                                            <v-list-tile-title>  Описание: </v-list-tile-title>
+                                            <v-list-subtitle><span class="grey--text text--darken-2">[[ selected.description ]]</span></v-list-subtitle>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>mail</v-icon>
+                                        </v-list-tile-avatar>
+                                       <v-list-tile-content> 
+                                            <v-list-tile-title>  Логин: </v-list-tile-title>
+                                            <v-list-subtitle><span class="grey--text text--darken-2">[[ selected.login ]]</span></v-list-subtitle>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>https</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content> 
+                                            <v-list-tile-title> Пароль: </v-list-tile-title>
+                                            <v-list-subtitle><span class="grey--text text--darken-2">[[ selected.password ]]</span></v-list-subtitle>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>link</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content> 
+                                            <v-list-tile-title>  Ссылка: </v-list-tile-title>
+                                            <v-list-subtitle><span class="grey--text text--darken-2">[[ selected.url ]]</span></v-list-subtitle>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                </v-list>
+                            </v-bottom-sheet>
+                        </div>
+                    </template>
+                </v-content>
+            </main>
+            <v-btn fab bottom right color="pink" dark fixed @click.stop="dialog = !dialog">
+                <v-icon>add</v-icon>
+            </v-btn>
+
+
+
+            <v-dialog v-model="dialog" width="800px">
+                <v-form>
+                    <v-card>
+                        <v-card-title class="grey lighten-4 py-4 title">
+                            Новый пароль
+                        </v-card-title>
+                        <v-container grid-list-sm class="pa-4">
+                            <v-layout row wrap>
+                                
+                                <v-flex xs12 align-center justify-space-between>
+                                    <v-layout align-center>
+                                        <v-text-field v-model="newPassword.title" placeholder="Название"></v-text-field>
+                                    </v-layout>
+                                </v-flex>
+                                <v-flex xs12>
+                                    <v-text-field v-model="newPassword.description" prepend-icon="info" placeholder="Описание"></v-text-field>
+                                </v-flex>
+                                <v-flex xs6>
+                                    <v-text-field v-model="newPassword.login" prepend-icon="mail" placeholder="Логин"></v-text-field>
+                                </v-flex>
+                                <v-flex xs6>
+                                    <v-text-field  v-model="newPassword.password" prepend-icon="vpn_key" placeholder="Пароль"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12>
+                                    <v-text-field v-model="newPassword.url" prepend-icon="notes" placeholder="Ссылка"></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="primary" @click="dialog = false">Отмена</v-btn>
+                            <v-btn flat @click="createPassword">Сохранение</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-form>
+            </v-dialog>
+        </v-app>
+    </div>
+
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <script>
+        var vue = new Vue({ 
+            el: '#app',
+            delimiters: ["[[", "]]"],
+            data: {
+                    dialog: false,
+                    drawer: false,
+                    sheet: false,
+                    selected: {},
+                    tiles: [
+                            { img: 'keep.png', title: 'Keep' },
+                            { img: 'inbox.png', title: 'Inbox' },
+                            { img: 'hangouts.png', title: 'Hangouts' },
+                            { img: 'messenger.png', title: 'Messenger' },
+                            { img: 'google.png', title: 'Google+' },
+                        ],
+                    passwords: [],
+                    newPassword: {
+                        "title": "", 
+                        "description": "", 
+                        "login": "", 
+                        "password": "",
+                        "url": "",
+                    },
+                    headers: [ 
+                                { text: "Название", value: "title"}, 
+                                { text: "Логин", value: "login" } , 
+                                { text: "Пароль", value: "password"}, 
+                                { text: "Ссылка", value: "url"}
+                    ],
+                    items: [
+                        { icon: 'contacts', text: 'One' },
+                        { icon: 'history', text: 'Two' },
+                        { icon: 'content_copy', text: 'Three' },
+                       /* {
+                            icon: 'keyboard_arrow_up',
+                            'icon-alt': 'keyboard_arrow_down',
+                            text: 'Labels',
+                            model: true,
+                            children: [
+                                { icon: 'add', text: 'Create label' }
+                            ]
+                        },
+                        {
+                            icon: 'keyboard_arrow_up',
+                            'icon-alt': 'keyboard_arrow_down',
+                            text: 'More',
+                            model: false,
+                            children: [
+                                { text: 'Import' },
+                                { text: 'Export' },
+                                { text: 'Print' },
+                                { text: 'Undo changes' },
+                                { text: 'Other contacts' }
+                            ]
+                        },
+                        { icon: 'settings', text: 'Settings' },
+                        { icon: 'chat_bubble', text: 'Send feedback' },
+                        { icon: 'help', text: 'Help' },
+                        { icon: 'phonelink', text: 'App downloads' },
+                        { icon: 'keyboard', text: 'Go to the old version' }*/
+                    ]
+            },
+
+            methods: {
+                createPassword: function (event) {
+                    this.dialog = false;
+                    axios.post(
+                        'http://127.0.0.1:5000/storage',
+                        this.newPassword
+                    )
+                    .then(response => { 
+                        console.log(response)
+                        this.updatePasswords()
+                        this.newPassword = {
+                            "title": "", 
+                            "description": "", 
+                            "login": "", 
+                            "password": "",
+                            "url": "",
+                        }
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                },
+                updatePasswords: function() {
+                    axios.get(`http://127.0.0.1:5000/storage`)
+                        .then(response => {
+                            // JSON responses are automatically parsed.
+                            this.passwords = response.data
+                            console.log(this.passwords)
+                        })
+                        .catch(e => {
+                            this.errors.push(e)
+                        })
+                },
+                showPassword: function(id) {
+                    this.sheet = true;
+                    this.selected = this.passwords.find(item => item.id === id.toString())
+                }
+            },
+
+            created(){
+                this.updatePasswords()
+            }
+        })
+    </script>
+</body>
+
+</html>
