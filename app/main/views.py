@@ -80,7 +80,7 @@ class StorageApi(Resource):
         if not changed_password:
             return abort(404)
 
-        if changed_password.owner != current_user:
+        if changed_password.owner != current_user.id:
             return abort(403)
 
         changed_password.title = args["title"]
@@ -100,7 +100,7 @@ class StorageApi(Resource):
         if not removed_password:
             return abort(404)
 
-        if removed_password.owner != current_user:
+        if removed_password.owner != current_user.id:
             return abort(403)
 
         db.session.delete(removed_password)
