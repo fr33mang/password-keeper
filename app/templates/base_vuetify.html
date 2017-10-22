@@ -119,15 +119,10 @@
                     <template>
                         <div class="text-xs-center">
                             <v-bottom-sheet v-model="sheet">
-                               
                                 <v-list two-line style="position: relative;">
-                                    <v-btn top right absolute fab dark color="cyan">
+                                    <v-btn top right absolute fab dark @click="editPassword" color="cyan">
                                         <v-icon dark>edit</v-icon>
                                     </v-btn>
-
-                                    <!--<v-btn top right absolute fab dark color="red">
-                                        <v-icon dark>delete</v-icon>
-                                    </v-btn>-->
 
                                     <v-subheader>[[ selected.title ]]</v-subheader>
                                     <v-list-tile>
@@ -172,13 +167,13 @@
                     </template>
                 </v-content>
             </main>
-            <v-btn fab bottom right color="pink" dark fixed @click.stop="dialog = !dialog">
+            <v-btn fab bottom right color="pink" dark fixed @click.stop="createDialog = !createDialog">
                 <v-icon>add</v-icon>
             </v-btn>
 
 
 
-            <v-dialog v-model="dialog" width="800px">
+            <v-dialog v-model="createDialog" width="800px">
                 <v-form>
                     <v-card>
                         <v-card-title class="grey lighten-4 py-4 title">
@@ -208,8 +203,46 @@
                         </v-container>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn flat color="primary" @click="dialog = false">Отмена</v-btn>
+                            <v-btn flat color="primary" @click="createDialog = false">Отмена</v-btn>
                             <v-btn flat @click="createPassword">Сохранение</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-form>
+            </v-dialog>
+
+            <v-dialog v-model="editDialog" width="800px">
+                <v-form>
+                    <v-card>
+                        <v-card-title class="grey lighten-4 py-4 title">
+                            Редактирование
+                        </v-card-title>
+                        <v-container grid-list-sm class="pa-4">
+                            <v-layout row wrap>
+            
+                                <v-flex xs12 align-center justify-space-between>
+                                    <v-layout align-center>
+                                        <v-text-field v-model="selected.title" placeholder="Название"></v-text-field>
+                                    </v-layout>
+                                </v-flex>
+                                <v-flex xs12>
+                                    <v-text-field v-model="selected.description" prepend-icon="info" placeholder="Описание"></v-text-field>
+                                </v-flex>
+                                <v-flex xs6>
+                                    <v-text-field v-model="selected.login" prepend-icon="mail" placeholder="Логин"></v-text-field>
+                                </v-flex>
+                                <v-flex xs6>
+                                    <v-text-field v-model="selected.password" prepend-icon="vpn_key" placeholder="Пароль"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12>
+                                    <v-text-field v-model="selected.url" prepend-icon="notes" placeholder="Ссылка"></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="error" @click=removePassword>Удалить</v-btn>
+                            <v-btn flat color="primary" @click="editDialog = !editDialog">Отмена</v-btn>
+                            <v-btn flat @click="updatePassword">Сохранение</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-form>
@@ -226,17 +259,11 @@
             el: '#app',
             delimiters: ["[[", "]]"],
             data: {
-                    dialog: false,
+                    createDialog: false,
+                    editDialog: false,
                     drawer: false,
                     sheet: false,
                     selected: {},
-                    tiles: [
-                            { img: 'keep.png', title: 'Keep' },
-                            { img: 'inbox.png', title: 'Inbox' },
-                            { img: 'hangouts.png', title: 'Hangouts' },
-                            { img: 'messenger.png', title: 'Messenger' },
-                            { img: 'google.png', title: 'Google+' },
-                        ],
                     passwords: [],
                     newPassword: {
                         "title": "", 
@@ -245,6 +272,7 @@
                         "password": "",
                         "url": "",
                     },
+                    editablePassword: { },
                     headers: [ 
                                 { text: "Название", value: "title"}, 
                                 { text: "Логин", value: "login" } , 
@@ -287,14 +315,14 @@
 
             methods: {
                 createPassword: function (event) {
-                    this.dialog = false;
+                    this.createDialog = false;
                     axios.post(
                         'http://127.0.0.1:5000/storage',
                         this.newPassword
                     )
                     .then(response => { 
                         console.log(response)
-                        this.updatePasswords()
+                        this.readPasswords()
                         this.newPassword = {
                             "title": "", 
                             "description": "", 
@@ -307,7 +335,7 @@
                         console.log(e)
                     })
                 },
-                updatePasswords: function() {
+                readPasswords: function() {
                     axios.get(`http://127.0.0.1:5000/storage`)
                         .then(response => {
                             // JSON responses are automatically parsed.
@@ -318,14 +346,48 @@
                             this.errors.push(e)
                         })
                 },
+                updatePassword: function(id) {
+                    axios.put(
+                        'http://127.0.0.1:5000/storage',
+                        this.selected,
+                    )
+                    .then(response => {
+                        console.log(response)
+                        this.editDialog = false;
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                },
+                removePassword: function() {
+                    axios({
+                        method: 'delete', 
+                        url: 'http://127.0.0.1:5000/storage', 
+                        data: { id: this.selected.id.toString() }
+                    })
+                    .then(response => {
+                        console.log(response)
+                        this.editDialog = false;
+                        this.sheet = false;
+                        this.selected = {};
+                        this.readPasswords();
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                },
                 showPassword: function(id) {
                     this.sheet = true;
                     this.selected = this.passwords.find(item => item.id === id.toString())
+                },
+                editPassword: function() {
+                    this.editDialog = true;
+                    this.sheet = false;
                 }
             },
 
             created(){
-                this.updatePasswords()
+                this.readPasswords()
             }
         })
     </script>
