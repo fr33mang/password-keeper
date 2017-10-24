@@ -8,8 +8,8 @@ from ..models import User, Password
 from . import main
 #from .forms import NameForm
 
-
 @main.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     return render_template('index.html')
 

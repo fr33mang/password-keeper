@@ -1,7 +1,195 @@
-{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} {% block title %}Flasky - Login{% endblock %}
+{% extends "base_vuetify.html" %} 
 
-{% block page_content %}
-<div class="page-header">
+{% block title %}Password keeper - Login{% endblock %}
+
+{% block application %}
+    <div id="app">
+        <v-app>
+            <main>
+                <v-content>
+                    <v-container v-show="login" fluid fill-height>
+                        <v-layout align-center justify-center>
+                            <v-flex md4>
+                                {% for message in get_flashed_messages() %}
+                                    <v-alert color="error" icon="warning" value="true">
+                                        {{ message }}
+                                    </v-alert>
+                                {% endfor %}
+
+                                <v-form v-model="loginFormValid">
+
+                                    <v-text-field 
+                                        label="Email" 
+                                        v-model="loginCredentials.email" 
+                                        :rules="emailRules" 
+                                        required>
+                                    </v-text-field>
+                                    
+                                    <v-text-field 
+                                        name="input-10-1" 
+                                        label="Пароль" 
+                                        hint="Как минимум 8 символов" 
+                                        v-model="loginCredentials.password" 
+                                        min="8" 
+                                        :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
+                                        :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
+                                        :type="passFieldHidden ? 'password' : 'text'" 
+                                        counter
+                                        required>
+                                    </v-text-field>
+
+                                    <v-checkbox label="Запомнить меня" v-model="loginCredentials.rememberMe"></v-checkbox>
+                                    
+                                    <v-btn  :disabled="!loginFormValid" @click="DoLogin">
+                                        Войти
+                                    </v-btn>
+
+                                    <v-btn flat @click="login = !login">
+                                        Регистрация
+                                    </v-btn>
+                                </v-form>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+
+                    <v-container v-show="!login" fluid fill-height>
+                        <v-layout align-center justify-center>
+                            <v-flex md4>
+                                <v-form v-model="registerFormValid">
+                                    <v-text-field 
+                                        name="email"
+                                        label="Email" 
+                                        v-model="registerCredentials.email" 
+                                        :rules="emailRules" 
+                                        required></v-text-field>
+                                    
+                                    <v-text-field 
+                                        name="username"
+                                        label="Имя пользователя" 
+                                        v-model="registerCredentials.username" 
+                                        required>
+                                    </v-text-field>
+
+                                    <v-text-field 
+                                        name="password" 
+                                        label="Пароль" 
+                                        hint="Как минимум 8 символов" 
+                                        v-model="registerCredentials.password" 
+                                        min="8" 
+                                        :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
+                                        :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
+                                        :type="passFieldHidden ? 'password' : 'text'" 
+                                        counter 
+                                        required>
+                                    </v-text-field>
+
+                                    <v-text-field 
+                                        name="input-10-1" 
+                                        label="Повторите пароль" 
+                                        v-model="registerCredentials.password2"
+                                        type="password" 
+                                        counter 
+                                        required>
+                                    </v-text-field>
+
+                                    <v-text-field 
+                                        name="input-10-1" 
+                                        label="Пароль хранилища" 
+                                        v-model="registerCredentials.master_password" 
+                                        type="password" 
+                                        counter 
+                                        required>
+                                    </v-text-field>
+
+                                    <v-text-field 
+                                        name="input-10-1" 
+                                        label="Повторите пароль хранилища" 
+                                        v-model="registerCredentials.master_password2"
+                                        type="password" 
+                                        counter 
+                                        required>
+                                    </v-text-field>
+                                    
+                                    <v-btn :disabled="!registerFormValid" @click="DoRegister">
+                                        Регистрация
+                                    </v-btn>
+                                    
+                                    <v-btn @click="login = !login">
+                                        Войти
+                                    </v-btn>
+                                </v-form>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-content>
+            </main>
+        </v-app>
+    </div>
+{% endblock application %}
+
+
+{% block vue_application %}
+    <script>
+        var vue = new Vue({
+            el: '#app',
+            delimiters: ["[[", "]]"],
+            data: {
+                passFieldHidden: true,
+                loginFormValid: false,
+                registerFormValid: false,
+                login: true,
+                loginCredentials: {
+                    email: "",
+                    password: "",
+                    rememberMe: ""
+                },
+                registerCredentials: {
+                    login: "",
+                    email: "",
+                    password: "",
+                    password2: "",
+                    master_password: "",
+                    master_password2: ""
+                },
+                emailRules: [
+                    (v) => !!v || 'E-mail is required',
+                    (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+                ],
+            },
+            methods: {
+                DoLogin: function () {
+                    axios.post(
+                        "/login",
+                        this.loginCredentials 
+                    )
+                    .then(response => {
+                            console.log(response)
+                            window.location.href = "/"
+                        })
+                        .catch(e => {
+                            console.log(e)
+                        })
+
+                },
+                DoRegister: function () {
+                    axios.post(
+                        "/register",
+                        this.registerCredentials
+                    )
+                    .then(response => {
+                            console.log(response)
+                            this.login = true
+                        })
+                        .catch(e => {
+                            console.log(e)
+                        })
+                },
+            },
+        })
+    </script>
+{% endblock vue_application %}
+
+<!--<div class="page-header">
     <h1>Login</h1>
 </div>
 <div class="col-md-4">
@@ -9,5 +197,4 @@
     <br>
     <p>New user?
         <a href="{{ url_for('auth.register') }}">Click here to register</a>.</p>
-</div>
-{% endblock %}
+</div> -->

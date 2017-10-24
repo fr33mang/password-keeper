@@ -15,7 +15,7 @@ def login():
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('Invalid username or password.')
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html')
 
 
 @auth.route('/logout')
@@ -32,7 +32,8 @@ def register():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password=form.password.data)
+                    password=form.password.data,
+                    master_password_hash=form.master_password.data)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('auth.login'))
