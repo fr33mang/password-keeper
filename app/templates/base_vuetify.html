@@ -242,7 +242,7 @@
                             </v-container>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn flat color="error" @click=removePassword>Удалить</v-btn>
+                                <v-btn flat color="error" @click=deletePassword>Удалить</v-btn>
                                 <v-btn flat color="primary" @click="editDialog = !editDialog">Отмена</v-btn>
                                 <v-btn flat @click="updatePassword">Сохранение</v-btn>
                             </v-card-actions>
@@ -363,7 +363,7 @@
                                 console.log(e)
                             })
                     },
-                    removePassword: function () {
+                    deletePassword: function () {
                         axios({
                             method: 'delete',
                             url: '/storage',
