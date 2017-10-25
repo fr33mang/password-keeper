@@ -144,7 +144,7 @@
                     rememberMe: ""
                 },
                 registerCredentials: {
-                    login: "",
+                    username: "",
                     email: "",
                     password: "",
                     password2: "",
@@ -172,6 +172,12 @@
 
                 },
                 DoRegister: function () {
+                    this.registerCredentials.master_password = Sha256.hash(
+                                    this.registerCredentials.master_password)
+
+                    this.registerCredentials.master_password2 = Sha256.hash(
+                                    this.registerCredentials.master_password2)
+        
                     axios.post(
                         "/register",
                         this.registerCredentials
