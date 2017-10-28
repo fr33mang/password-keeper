@@ -43,5 +43,5 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default': DevelopmentConfig
+    'default': os.environ.get('CONFIG') or DevelopmentConfig
 }
