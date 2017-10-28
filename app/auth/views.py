@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, abort, jsonify
 from flask_login import login_user, logout_user, login_required, \
     current_user
 from . import auth
@@ -53,4 +53,15 @@ def change_password():
             flash('Invalid password.')
     return render_template("auth/change_password.html", form=form)
 
+@auth.route('/check-master-password', methods=['POST'])
+@login_required
+def check_master_password():
+    json = request.get_json()
+    
+    master_password_hash = json['master_password_hash']
+    
+    if master_password_hash != current_user.master_password_hash:
+      return jsonify({ "status": "invalid_master_password" }), 403
+
+    return jsonify({ "status": "ok"})
 

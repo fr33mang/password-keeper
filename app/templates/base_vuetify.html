@@ -94,10 +94,9 @@
                                                     hide-actions 
                                                     class="elevation-1">
                                             <template slot="items" slot-scope="props">
-                                                <tr @click="showPassword([[ props.item.id ]])" >
+                                                <tr @click="checkMasterPassword(showPassword, [[ props.item.id ]])" >
                                                     <td>[[ props.item.title ]]</td>
                                                     <td class="text-xs-right">[[ props.item.login ]]</td>
-                                                    <td class="text-xs-right">[[ props.item.password ]]</td>
                                                     <td class="text-xs-right">[[ props.item.url ]]</td>
                                                 </tr>
                                             </template>
@@ -109,7 +108,7 @@
                             <v-flex hidden-sm-and-up>
                                 <v-list two-line>
                                     <template v-for="item in passwords">
-                                        <v-list-tile @click="showPassword([[ item.id ]])">
+                                        <v-list-tile @click="checkMasterPassword(showPassword, [[ item.id ]])">
                                             <v-list-tile-content>
                                                 <v-list-tile-title v-html="item.title"></v-list-tile-title>
                                                 <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
@@ -122,7 +121,7 @@
                         </v-container>
                         <template>
                             <div class="text-xs-center">
-                                <v-bottom-sheet v-model="sheet">
+                                <v-bottom-sheet v-model="passwordDescriptionSheet">
                                     <v-list two-line style="position: relative;">
                                         <v-btn top right absolute fab dark @click="editPassword" color="cyan">
                                             <v-icon dark>edit</v-icon>
@@ -206,7 +205,7 @@
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn flat color="primary" @click="createDialog = false">Отмена</v-btn>
-                                <v-btn flat @click="createPassword">Сохранение</v-btn>
+                                <v-btn flat @click="checkMasterPassword(createPassword)">Сохранение</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-form>
@@ -244,11 +243,49 @@
                                 <v-spacer></v-spacer>
                                 <v-btn flat color="error" @click=deletePassword>Удалить</v-btn>
                                 <v-btn flat color="primary" @click="editDialog = !editDialog">Отмена</v-btn>
-                                <v-btn flat @click="updatePassword">Сохранение</v-btn>
+                                <v-btn flat @click="checkMasterPassword(updatePassword, selected.id)">Сохранение</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-form>
                 </v-dialog>
+
+                <v-dialog v-model="masterPasswordDialog" max-width="500px">
+                    <v-form @submit.prevent="checkMasterPassword(masterPasswordCallback, masterPasswordCallbackParams)">
+                        <v-card>
+                            <v-card-title>
+                                Подтвердите мастер пароль
+                            </v-card-title>
+                            <v-container>
+                                <v-layout row wrap>
+                                    <v-flex>
+                                        <v-text-field 
+                                            v-model="masterPassword" 
+                                            prepend-icon="vpn_key" 
+                                            placeholder="Пароль"
+                                            :append-icon="masterPasswordFieldHidden ? 'visibility' : 'visibility_off'" 
+                                            :append-icon-cb="() => (masterPasswordFieldHidden = !masterPasswordFieldHidden)"
+                                            :type="masterPasswordFieldHidden ? 'password' : 'text'">
+                                        </v-text-field>
+                                    </v-flex>
+                                </v-layout>
+                            </v-container>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn flat @click="checkMasterPassword(masterPasswordCallback, masterPasswordCallbackParams)">Ок</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-form>
+                </v-dialog>
+
+                <v-snackbar 
+                    :timeout="5000" 
+                    :color="snackbar.color"
+                    bottom
+                    left
+                    v-model="showSnackbar">
+
+                    [[ snackbar.text ]]
+                </v-snackbar>
             </v-app>
         </div>
     {% endblock application %}
@@ -263,26 +300,39 @@
                 el: '#app',
                 delimiters: ["[[", "]]"],
                 data: {
+                    /* TODO create ui object for some data fields to contain it */
                     createDialog: false,
                     editDialog: false,
                     drawer: false,
-                    sheet: false,
-                    selected: {},
+                    passwordDescriptionSheet: false,
+                    masterPasswordDialog: false,
+                    showSnackbar: false,
+                    masterPassword: "",
+                    masterPasswordCallback: "",
+                    masterPasswordCallbackParams: "",
+                    masterPasswordFieldHidden: true,
+                    selected: {
+                        "master_password_hash": ""
+                    },
                     passwords: [],
+                    passwordsDectypted: false,
                     newPassword: {
                         "title": "",
                         "description": "",
                         "login": "",
                         "password": "",
                         "url": "",
+                        "master_password_hash": ""
                     },
-                    editablePassword: {},
                     headers: [
                         { text: "Название", value: "title" },
                         { text: "Логин", value: "login" },
-                        { text: "Пароль", value: "password" },
                         { text: "Ссылка", value: "url" }
                     ],
+                    snackbar: {
+                        "text": "",
+                        "color": "",
+                    },
                     items: [
                         { icon: 'contacts', text: 'One' },
                         { icon: 'history', text: 'Two' },
@@ -318,50 +368,70 @@
                 },
 
                 methods: {
-                    createPassword: function (event) {
-                        this.createDialog = false;
-                        axios.post(
-                            '/storage',
-                            this.newPassword
-                        )
-                            .then(response => {
-                                console.log(response)
-                                this.readPasswords()
-                                this.newPassword = {
-                                    "title": "",
-                                    "description": "",
-                                    "login": "",
-                                    "password": "",
-                                    "url": "",
-                                }
-                            })
-                            .catch(e => {
-                                console.log(e)
-                            })
+                    createPassword: function () {
+                        if (!this.masterPassword) {
+                            this.snackbar.text = "Введите мастер-пароль и повторите операцию!"
+                            this.snackbar.color = "error"
+                            this.showSnackbar = true
+                        } else {
+                            this.createDialog = false;
+
+                            this.newPassword.master_password_hash = Sha256.hash(this.masterPassword)
+                            this.newPassword.password = cryptico.encryptAESCBC(this.newPassword.password, this.masterPassword)
+
+                            axios.post(
+                                '/storage',
+                                this.newPassword
+                            )
+                                .then(response => {
+                                    this.readPasswords()
+                                    this.newPassword = {
+                                        "title": "",
+                                        "description": "",
+                                        "login": "",
+                                        "password": "",
+                                        "url": "",
+                                    }
+                                })
+                                .catch(e => {
+                                    console.log(e)
+                                })
+
+                        } 
                     },
                     readPasswords: function () {
                         axios.get(`/storage`)
                             .then(response => {
-                                // JSON responses are automatically parsed.
                                 this.passwords = response.data
-                                console.log(this.passwords)
-                            })
-                            .catch(e => {
-                                this.errors.push(e)
-                            })
-                    },
-                    updatePassword: function (id) {
-                        axios.put(
-                            '/storage',
-                            this.selected,
-                        )
-                            .then(response => {
-                                console.log(response)
-                                this.editDialog = false;
+                                this.passwordsDectypted = false
                             })
                             .catch(e => {
                                 console.log(e)
                             })
+                    },
+                    updatePassword: function () {
+                        if (!this.masterPassword) {
+                            this.snackbar.text = "Введите мастер-пароль и повторите операцию!"
+                            this.snackbar.color = "error"
+                            this.showSnackbar = true
+                            this.masterPasswordCallback = callback
+                            this.masterPasswordCallbackParams = arguments
+                        } else {
+                            this.selected.master_password_hash = Sha256.hash(this.masterPassword)
+                            this.selected.password = cryptico.encryptAESCBC(this.selected.password, this.masterPassword)
+
+                            axios.put(
+                                '/storage',
+                                this.selected,
+                            )
+                                .then(response => {
+                                    console.log(response)
+                                    this.editDialog = false;
+                                })
+                                .catch(e => {
+                                    console.log(e)
+                                })
+                        }
                     },
                     deletePassword: function () {
                         axios({
@@ -378,14 +448,56 @@
                                 console.log(e)
                             })
                     },
-                    showPassword: function (id) {
-                        this.sheet = true;
-                        this.selected = this.passwords.find(item => item.id === id.toString())
+                    showPassword: function (arguments) {
+                        if (!this.masterPassword) {
+                            this.snackbar.text = "Введите мастер-пароль и повторите операцию!"
+                            this.snackbar.color = "error"
+                            this.showSnackbar = true
+                            this.masterPasswordCallback = callback
+                            this.masterPasswordCallbackParams = arguments
+                        } else {
+                            if (!this.passwordsDectypted) {
+                                this.passwords.forEach( (p) => {
+                                    p.password = cryptico.decryptAESCBC(p.password, this.masterPassword)
+                                })
+
+                                this.passwordsDectypted = true
+                            }
+
+                            console.log(arguments)
+
+                            var id = arguments[1].toString()
+                            this.selected = this.passwords.find(item => item.id === id)
+        
+                            this.passwordDescriptionSheet = true;
+                        }                        
                     },
                     editPassword: function () {
                         this.editDialog = true;
-                        this.sheet = false;
-                    }
+                        this.passwordDescriptionSheet = false;
+                    },
+                    checkMasterPassword: function(callback) {
+                        if (!this.masterPassword) {
+                            this.masterPasswordDialog = true
+                            this.masterPasswordCallback = callback
+                            this.masterPasswordCallbackParams = arguments[1]
+                        } else {
+                            axios.post("/check-master-password", {
+                                "master_password_hash": Sha256.hash(this.masterPassword)
+                            })
+                                .then(response => {
+                                    this.masterPasswordDialog = false
+                                    callback(arguments)
+                                })
+                                .catch(e => {
+                                    console.log(e)
+                                    this.snackbar.text = "Неверный мастер пароль, попробуйте еще!"
+                                    this.snackbar.color = "error"
+                                    this.showSnackbar = true
+                                    this.masterPassword = ""
+                                })
+                            }
+                        }
                 },
 
                 created() {

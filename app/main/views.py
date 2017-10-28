@@ -13,7 +13,7 @@ from . import main
 def index():
     return render_template('index.html')
 
-user_marshaller = {
+USER_MARSHALLER = {
     'id': fields.String,
     'username': fields.String,
 }
@@ -22,13 +22,7 @@ class User(Resource):
     def get(self, user_id):
         return { 'user': User.query.filter(id=user_id).first() }
 
-class UserList(Resource):
-    @marshal_with(user_marshaller)
-    def get(self):
-        return User.query.all()
-
-
-password_marshaller = {
+PASSWORD_MARSHALLER = {
     "id": fields.String,
     "title": fields.String,
     "description": fields.String,
@@ -37,28 +31,36 @@ password_marshaller = {
     "url": fields.String,
 }
 
-password_post_args = reqparse.RequestParser()
-password_post_args.add_argument("title")
-password_post_args.add_argument("description")
-password_post_args.add_argument("login")
-password_post_args.add_argument("password")
-password_post_args.add_argument("url")
+MASTER_PASSWORD_HASH_ARGS = reqparse.RequestParser()
+MASTER_PASSWORD_HASH_ARGS.add_argument("master_password_hash")
 
-password_put_args = password_post_args
-password_put_args.add_argument("id")
+PASSWORD_POST_ARGS = MASTER_PASSWORD_HASH_ARGS
+PASSWORD_POST_ARGS.add_argument("title")
+PASSWORD_POST_ARGS.add_argument("description")
+PASSWORD_POST_ARGS.add_argument("login")
+PASSWORD_POST_ARGS.add_argument("password")
+PASSWORD_POST_ARGS.add_argument("url")
 
-password_delete_args = reqparse.RequestParser()
-password_delete_args.add_argument("id")
+PASSWORD_PUT_ARGS = PASSWORD_POST_ARGS
+PASSWORD_PUT_ARGS.add_argument("id")
+
+PASSWORD_DELETE_ARGS = reqparse.RequestParser()
+PASSWORD_DELETE_ARGS.add_argument("id")
 
 class StorageApi(Resource):
     @login_required
-    @marshal_with(password_marshaller)
+    @marshal_with(PASSWORD_MARSHALLER)
     def get(self):
         return Password.query.filter_by(owner=current_user.id).all() 
 
     @login_required
     def post(self):
-        args = password_post_args.parse_args()
+        master_password_hash = MASTER_PASSWORD_HASH_ARGS.parse_args()["master_password_hash"]
+
+        if master_password_hash != current_user.master_password_hash:
+            return abort(403, "Invalid master password")
+
+        args = PASSWORD_POST_ARGS.parse_args()
 
         new_password = Password(
             title= args["title"],
@@ -73,7 +75,7 @@ class StorageApi(Resource):
 
     @login_required
     def put(self):
-        args = password_put_args.parse_args()
+        args = PASSWORD_PUT_ARGS.parse_args()
 
         changed_password = Password.query.get(args["id"])
 
@@ -83,17 +85,23 @@ class StorageApi(Resource):
         if changed_password.owner != current_user.id:
             return abort(403)
 
+        master_password_hash = MASTER_PASSWORD_HASH_ARGS.parse_args()[
+            "master_password_hash"]
+
+        if master_password_hash != current_user.master_password_hash:
+            return abort(403, "Invalid master password")
+
         changed_password.title = args["title"]
         changed_password.description = args["description"]
         changed_password.login = args["login"]
         changed_password.password = args["password"]
-        changed_password.url = args["url"]
+        changed_password.url = args["url"]  
 
         db.session.commit()
 
     @login_required
     def delete(self):
-        args = password_delete_args.parse_args()
+        args = PASSWORD_DELETE_ARGS.parse_args()
 
         removed_password = Password.query.get(args["id"])
 
@@ -105,3 +113,4 @@ class StorageApi(Resource):
 
         db.session.delete(removed_password)
         db.session.commit()
+

@@ -63,7 +63,7 @@ var aes = (function () {
                 ks = 16 * (14 + 1);
                 break;
             default:
-                alert("my.ExpandKey: Only key lengths of 16, 24 or 32 bytes allowed!");
+                console.log("my.ExpandKey: Only key lengths of 16, 24 or 32 bytes allowed!");
         }
         for (var i = kl; i < ks; i += 4) {
             var temp = key.slice(i - 4, i);

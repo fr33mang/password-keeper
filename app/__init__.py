@@ -27,9 +27,8 @@ def create_app(config_name):
     db.init_app(app)
     login_manager.init_app(app)
 
-    from .main.views import UserList, StorageApi
+    from .main.views import StorageApi
 
-    api.add_resource(UserList, '/users')
     api.add_resource(StorageApi, '/storage')
     api.init_app(app)   
 
