@@ -12,7 +12,7 @@ Simple password keeper with Python Flask RESTful back end and Vue.js front end(V
 # TO-DO
 
 * JWT-based auth
-* Client side password encryption/decryption
+* ~~Client side password encryption/decryption~~
 * Password groups
 * Android app
 * Chrome extension
