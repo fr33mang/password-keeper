@@ -43,5 +43,7 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default': os.environ.get('CONFIG') or DevelopmentConfig
+    'default': ProductionConfig if os.environ.get('CONFIG') == "production" else DevelopmentConfig
 }
+
+
