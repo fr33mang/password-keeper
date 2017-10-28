@@ -277,7 +277,7 @@
                 </v-dialog>
 
                 <v-snackbar 
-                    :timeout="5000" 
+                    :timeout="3000" 
                     :color="snackbar.color"
                     bottom
                     left
@@ -389,13 +389,15 @@
                                         "description": "",
                                         "login": "",
                                         "password": "",
-                                        "url": "",
+                                        "url": "",  
                                     }
+                                    this.snackbar.color = "primary"
+                                    this.snackbar.text = "Пароль добавлен в хранилище!"
+                                    this.showSnackbar = true
                                 })
                                 .catch(e => {
                                     console.log(e)
                                 })
-
                         } 
                     },
                     readPasswords: function () {
@@ -426,6 +428,10 @@
                                 .then(response => {
                                     console.log(response)
                                     this.editDialog = false;
+                                    this.selected.password = cryptico.decryptAESCBC(this.selected.password, this.masterPassword)
+                                    this.snackbar.color = "primary"
+                                    this.snackbar.text = "Пароль успешно обновлен!"
+                                    this.showSnackbar = true
                                 })
                                 .catch(e => {
                                     console.log(e)
@@ -442,6 +448,9 @@
                                 this.selected = {};
                                 this.editDialog = false;
                                 this.readPasswords();
+                                this.snackbar.color = "primary"
+                                this.snackbar.text = "Пароль удален из хранилища!"
+                                this.showSnackbar = true
                             })
                             .catch(e => {
                                 console.log(e)
