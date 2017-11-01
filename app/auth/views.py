@@ -32,8 +32,7 @@ def register():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password=form.password.data,
-                    master_password_hash=form.master_password.data)
+                    password=form.password.data)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('auth.login'))
@@ -60,7 +59,7 @@ def check_master_password():
     
     master_password_hash = json['master_password_hash']
     
-    if master_password_hash != current_user.master_password_hash:
+    if not current_user.verify_password(master_password_hash):
       return jsonify({ "status": "invalid_master_password" }), 403
 
     return jsonify({ "status": "ok"})

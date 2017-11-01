@@ -82,33 +82,6 @@
                                         counter 
                                         required>
                                     </v-text-field>
-
-                                    <v-text-field 
-                                        name="input-10-1" 
-                                        label="Повторите пароль" 
-                                        v-model="registerCredentials.password2"
-                                        type="password" 
-                                        counter 
-                                        required>
-                                    </v-text-field>
-
-                                    <v-text-field 
-                                        name="input-10-1" 
-                                        label="Пароль хранилища" 
-                                        v-model="registerCredentials.master_password" 
-                                        type="password" 
-                                        counter 
-                                        required>
-                                    </v-text-field>
-
-                                    <v-text-field 
-                                        name="input-10-1" 
-                                        label="Повторите пароль хранилища" 
-                                        v-model="registerCredentials.master_password2"
-                                        type="password" 
-                                        counter 
-                                        required>
-                                    </v-text-field>
                                     
                                     <v-btn :disabled="!registerFormValid" @click="DoRegister">
                                         Регистрация
@@ -148,8 +121,6 @@
                     email: "",
                     password: "",
                     password2: "",
-                    master_password: "",
-                    master_password2: ""
                 },
                 emailRules: [
                     (v) => !!v || 'E-mail is required',
@@ -172,12 +143,6 @@
 
                 },
                 DoRegister: function () {
-                    this.registerCredentials.master_password = Sha256.hash(
-                                    this.registerCredentials.master_password)
-
-                    this.registerCredentials.master_password2 = Sha256.hash(
-                                    this.registerCredentials.master_password2)
-        
                     axios.post(
                         "/register",
                         this.registerCredentials

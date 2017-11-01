@@ -57,7 +57,7 @@ class StorageApi(Resource):
     def post(self):
         master_password_hash = MASTER_PASSWORD_HASH_ARGS.parse_args()["master_password_hash"]
 
-        if master_password_hash != current_user.master_password_hash:
+        if not current_user.verify_password(master_password_hash):
             return abort(403, "Invalid master password")
 
         args = PASSWORD_POST_ARGS.parse_args()
@@ -88,7 +88,7 @@ class StorageApi(Resource):
         master_password_hash = MASTER_PASSWORD_HASH_ARGS.parse_args()[
             "master_password_hash"]
 
-        if master_password_hash != current_user.master_password_hash:
+        if not current_user.verify_password(master_password_hash):
             return abort(403, "Invalid master password")
 
         changed_password.title = args["title"]

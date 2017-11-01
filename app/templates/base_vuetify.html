@@ -13,7 +13,6 @@
         <script src="{{ url_for('static', filename='random.js') }}"></script>
         <script src="{{ url_for('static', filename='aes.js') }}"></script>
         <script src="{{ url_for('static', filename='api.js') }}"></script>
-        <script src="{{ url_for('static', filename='sha256.js') }}"></script>
     {% endblock %}
     
 </head>
@@ -375,7 +374,7 @@
                         } else {
                             this.createDialog = false;
 
-                            this.newPassword.master_password_hash = Sha256.hash(this.masterPassword)
+                            this.newPassword.master_password_hash = this.masterPassword
                             this.newPassword.password = cryptico.encryptAESCBC(this.newPassword.password, this.masterPassword)
 
                             axios.post(
@@ -418,7 +417,7 @@
                             this.masterPasswordCallback = callback
                             this.masterPasswordCallbackParams = arguments
                         } else {
-                            this.selected.master_password_hash = Sha256.hash(this.masterPassword)
+                            this.selected.master_password_hash = this.masterPassword
                             this.selected.password = cryptico.encryptAESCBC(this.selected.password, this.masterPassword)
 
                             axios.put(
@@ -491,7 +490,7 @@
                             this.masterPasswordCallbackParams = arguments[1]
                         } else {
                             axios.post("/check-master-password", {
-                                "master_password_hash": Sha256.hash(this.masterPassword)
+                                "master_password_hash": this.masterPassword
                             })
                                 .then(response => {
                                     this.masterPasswordDialog = false

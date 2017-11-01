@@ -19,14 +19,7 @@ class RegistrationForm(FlaskForm):
         Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                           'Usernames must have only letters, '
                                           'numbers, dots or underscores')])
-    password = PasswordField('Пароль', validators=[
-        Required(), EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Подтвердите пароль', validators=[Required()])
-
-    master_password = PasswordField('Пароль хранилища', validators=[
-        Required(), EqualTo('master_password2', message='Необходимо ввести пароль хранилища.')])
-
-    master_password2 = PasswordField('Подтвердите пароль хранилища', validators=[Required()])
+    password = PasswordField('Пароль', validators=[Required()])
 
     submit = SubmitField('Register')
 
@@ -43,5 +36,4 @@ class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old password', validators=[Required()])
     password = PasswordField('New password', validators=[
         Required(), EqualTo('password2', message='Passwords must match')])
-    password2 = PasswordField('Confirm new password', validators=[Required()])
     submit = SubmitField('Update Password')

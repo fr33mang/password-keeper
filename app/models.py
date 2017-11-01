@@ -12,7 +12,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    master_password_hash = db.Column(db.String(128))
 
     storage = db.relationship('Password', cascade='all,delete', backref='user', lazy=True)
 
