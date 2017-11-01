@@ -1,4 +1,4 @@
-# password-keeper
+# password-keeper [Heroku link](https://flask-vuejs-password-keeper.herokuapp.com/)
 
 Simple password keeper with Python Flask RESTful back end and Vue.js front end(Vuetify framework)
 
@@ -13,6 +13,7 @@ Simple password keeper with Python Flask RESTful back end and Vue.js front end(V
 
 * JWT-based auth
 * ~~Client side password encryption/decryption~~
+* ~~[Heroku](https://flask-vuejs-password-keeper.herokuapp.com/) deployment~~
 * Password groups
 * Android app
 * Chrome extension
