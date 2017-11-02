@@ -28,9 +28,7 @@
                                     <v-text-field 
                                         name="input-10-1" 
                                         label="Пароль" 
-                                        hint="Как минимум 8 символов" 
                                         v-model="loginCredentials.password" 
-                                        min="8" 
                                         :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
                                         :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
                                         :type="passFieldHidden ? 'password' : 'text'" 
@@ -88,7 +86,7 @@
                                     </v-btn>
                                     
                                     <v-btn @click="login = !login">
-                                        Войти
+                                        Есть учетная запись
                                     </v-btn>
                                 </v-form>
                             </v-flex>
@@ -123,8 +121,7 @@
                     password2: "",
                 },
                 emailRules: [
-                    (v) => !!v || 'E-mail is required',
-                    (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+                    (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Введите валидный email'
                 ],
             },
             methods: {

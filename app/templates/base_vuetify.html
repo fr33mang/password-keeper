@@ -93,7 +93,7 @@
                                                     hide-actions 
                                                     class="elevation-1">
                                             <template slot="items" slot-scope="props">
-                                                <tr @click="checkMasterPassword(showPassword, [[ props.item.id ]])" >
+                                                <tr style="cursor: pointer;" @click="checkMasterPassword(showPassword, [[ props.item.id ]])" >
                                                     <td>[[ props.item.title ]]</td>
                                                     <td class="text-xs-right">[[ props.item.login ]]</td>
                                                     <td class="text-xs-right">[[ props.item.url ]]</td>
