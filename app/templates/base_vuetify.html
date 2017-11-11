@@ -194,7 +194,14 @@
                                         <v-text-field v-model="newPassword.login" prepend-icon="mail" placeholder="Логин"></v-text-field>
                                     </v-flex>
                                     <v-flex xs6>
-                                        <v-text-field  v-model="newPassword.password" prepend-icon="vpn_key" placeholder="Пароль"></v-text-field>
+                                        <v-text-field  
+                                            v-model="newPassword.password" 
+                                            prepend-icon="vpn_key" 
+                                            placeholder="Пароль"
+                                            :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'" 
+                                            :append-icon-cb="() => (passFieldHidden = !passFieldHidden)"
+                                            :type="passFieldHidden ? 'password' : 'text'">
+                                        </v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
                                         <v-text-field v-model="newPassword.url" prepend-icon="notes" placeholder="Ссылка"></v-text-field>
@@ -231,7 +238,14 @@
                                         <v-text-field v-model="selected.login" prepend-icon="mail" placeholder="Логин"></v-text-field>
                                     </v-flex>
                                     <v-flex xs6>
-                                        <v-text-field v-model="selected.password" prepend-icon="vpn_key" placeholder="Пароль"></v-text-field>
+                                        <v-text-field 
+                                            v-model="selected.password" 
+                                            prepend-icon="vpn_key" 
+                                            placeholder="Пароль"
+                                            :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'" 
+                                            :append-icon-cb="() => (passFieldHidden = !passFieldHidden)"
+                                            :type="passFieldHidden ? 'password' : 'text'">
+                                        </v-text-field>
                                     </v-flex>
                                     <v-flex xs12>
                                         <v-text-field v-model="selected.url" prepend-icon="notes" placeholder="Ссылка"></v-text-field>
@@ -309,6 +323,7 @@
                     masterPasswordCallback: "",
                     masterPasswordCallbackParams: "",
                     masterPasswordFieldHidden: true,
+                    passFieldHidden: true,
                     selected: {
                         "master_password_hash": ""
                     },
