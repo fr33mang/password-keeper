@@ -7,6 +7,12 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
+    JWT_TOKEN_LOCATION = ['cookies', 'headers']
+    JWT_COOKIE_SECURE = False
+    #JWT_ACCESS_COOKIE_PATH = '/auth'
+    #JWT_RESRESH_PATH = '/auth/refresh'
+    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_SECRET_KEY = 'SUPER_SECRET_KEY'
     #MAIL_SERVER = 'smtp.googlemail.com'
     #MAIL_PORT = 587
     #MAIL_USE_TLS = True

@@ -20,7 +20,7 @@
 
                                     <v-text-field 
                                         label="Email" 
-                                        v-model="loginCredentials.email" 
+                                        v-model="loginCredentials.username" 
                                         :rules="emailRules" 
                                         required>
                                     </v-text-field>
@@ -36,8 +36,6 @@
                                         required>
                                     </v-text-field>
 
-                                    <v-checkbox label="Запомнить меня" v-model="loginCredentials.rememberMe"></v-checkbox>
-                                    
                                     <v-btn  :disabled="!loginFormValid" @click="DoLogin">
                                         Войти
                                     </v-btn>
@@ -110,9 +108,8 @@
                 registerFormValid: false,
                 login: true,
                 loginCredentials: {
-                    email: "",
+                    username: "",
                     password: "",
-                    rememberMe: ""
                 },
                 registerCredentials: {
                     username: "",
@@ -127,11 +124,13 @@
             methods: {
                 DoLogin: function () {
                     axios.post(
-                        "/login",
+                        "/token/auth",
                         this.loginCredentials 
                     )
                     .then(response => {
                             console.log(response)
+                            console.log(response.data.access_token)
+                            window.localStorage.setItem("access_token", response.data.access_token)
                             window.location.href = "/"
                         })
                         .catch(e => {
@@ -156,13 +155,3 @@
         })
     </script>
 {% endblock vue_application %}
-
-<!--<div class="page-header">
-    <h1>Login</h1>
-</div>
-<div class="col-md-4">
-    {{ wtf.quick_form(form) }}
-    <br>
-    <p>New user?
-        <a href="{{ url_for('auth.register') }}">Click here to register</a>.</p>
-</div> -->

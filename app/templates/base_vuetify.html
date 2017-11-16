@@ -83,92 +83,92 @@
                     </v-btn>
                 </v-toolbar>
                 <main>
-                    <v-content>
-                        <v-container fluid class="no-padding">
-                            <v-flex hidden-xs-only>
-                                <v-layout align-center>
-                                    <template>
-                                        <v-data-table v-bind:headers="headers" 
-                                                    v-bind:items="passwords" 
-                                                    hide-actions 
-                                                    class="elevation-1">
-                                            <template slot="items" slot-scope="props">
-                                                <tr style="cursor: pointer;" @click="checkMasterPassword(showPassword, [[ props.item.id ]])" >
-                                                    <td>[[ props.item.title ]]</td>
-                                                    <td class="text-xs-right">[[ props.item.login ]]</td>
-                                                    <td class="text-xs-right">[[ props.item.url ]]</td>
-                                                </tr>
-                                            </template>
-                                        </v-data-table>
-                                    </template>
-                                </v-layout>
-                            </v-flex>
+                    <v-container fluid fill-height ><!--class="no-padding"-->
+                        <v-flex hidden-xs-only align-center justify-center>
+                            <v-layout justify-center align-center>
+                                <template>
+                                    <v-data-table v-bind:headers="headers" 
+                                                v-bind:items="passwords" 
+                                                hide-actions 
+                                                class="elevation-1">
+                                        <template slot="items" slot-scope="props">
+                                            <tr style="cursor: pointer;" @click="checkMasterPassword(showPassword, [[ props.item.id ]])" >
+                                                <td>[[ props.item.title ]]</td>
+                                                <td class="text-xs-right">[[ props.item.login ]]</td>
+                                                <td class="text-xs-right">[[ props.item.url ]]</td>
+                                            </tr>
+                                        </template>
+                                    </v-data-table>
+                                </template>
+                            </v-layout>
+                        </v-flex>
 
-                            <v-flex hidden-sm-and-up>
-                                <v-list two-line>
-                                    <template v-for="item in passwords">
-                                        <v-list-tile @click="checkMasterPassword(showPassword, [[ item.id ]])">
-                                            <v-list-tile-content>
-                                                <v-list-tile-title v-html="item.title"></v-list-tile-title>
-                                                <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
-                                            </v-list-tile-content>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>                                    
-                                    </template>
-                                </v-list>
-                            </v-flex>
-                        </v-container>
-                        <template>
-                            <div class="text-xs-center">
-                                <v-bottom-sheet v-model="passwordDescriptionSheet">
-                                    <v-list two-line style="position: relative;">
-                                        <v-btn top right absolute fab dark @click="editPassword" color="cyan">
-                                            <v-icon dark>edit</v-icon>
-                                        </v-btn>
+                        <v-flex hidden-sm-and-up>
+                            <v-list two-line>
+                                <template v-for="item in passwords">
+                                    <v-list-tile @click="checkMasterPassword(showPassword, [[ item.id ]])">
+                                        <v-list-tile-content>
+                                            <v-list-tile-title v-html="item.title"></v-list-tile-title>
+                                            <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+                                    <v-divider></v-divider>                                    
+                                </template>
+                            </v-list>
+                        </v-flex>
+                    </v-container>
+                    
+                    <template>
+                        <div class="text-xs-center">
+                            <v-bottom-sheet v-model="passwordDescriptionSheet">
+                                <v-list two-line style="position: relative;">
+                                    <v-btn top right absolute fab dark @click="editPassword" color="cyan">
+                                        <v-icon dark>edit</v-icon>
+                                    </v-btn>
 
-                                        <v-subheader>[[ selected.title ]]</v-subheader>
-                                        <v-list-tile>
-                                            <v-list-tile-avatar>
-                                                <v-icon x-large>info</v-icon>
-                                            </v-list-tile-avatar>
-                                            <v-list-tile-content> 
-                                                <v-list-tile-title>  Описание: </v-list-tile-title>
-                                                <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.description ]]</span></v-list-tile-sub-title>
-                                            </v-list-tile-content>
-                                        </v-list-tile>
-                                        <v-list-tile>
-                                            <v-list-tile-avatar>
-                                                <v-icon x-large>mail</v-icon>
-                                            </v-list-tile-avatar>
+                                    <v-subheader>[[ selected.title ]]</v-subheader>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>info</v-icon>
+                                        </v-list-tile-avatar>
                                         <v-list-tile-content> 
-                                                <v-list-tile-title>  Логин: </v-list-tile-title>
-                                                <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.login ]]</span></v-list-tile-sub-title>
-                                            </v-list-tile-content>                                        
-                                        </v-list-tile>
-                                        <v-list-tile>
-                                            <v-list-tile-avatar>
-                                                <v-icon x-large>https</v-icon>
-                                            </v-list-tile-avatar>
-                                            <v-list-tile-content> 
-                                                <v-list-tile-title> Пароль: </v-list-tile-title>
-                                                <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.password ]]</span></v-list-tile-sub-title>
-                                            </v-list-tile-content>                                        
-                                        </v-list-tile>
-                                        <v-list-tile>
-                                            <v-list-tile-avatar>
-                                                <v-icon x-large>link</v-icon>
-                                            </v-list-tile-avatar>
-                                            <v-list-tile-content> 
-                                                <v-list-tile-title>  Ссылка: </v-list-tile-title>
-                                                <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.url ]]</span></v-list-tile-sub-title>
-                                            </v-list-tile-content>                                        
-                                        </v-list-tile>
-                                    </v-list>
-                                </v-bottom-sheet>
-                            </div>
-                        </template>
-                    </v-content>
+                                            <v-list-tile-title>  Описание: </v-list-tile-title>
+                                            <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.description ]]</span></v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>mail</v-icon>
+                                        </v-list-tile-avatar>
+                                    <v-list-tile-content> 
+                                            <v-list-tile-title>  Логин: </v-list-tile-title>
+                                            <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.login ]]</span></v-list-tile-sub-title>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>https</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content> 
+                                            <v-list-tile-title> Пароль: </v-list-tile-title>
+                                            <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.password ]]</span></v-list-tile-sub-title>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-avatar>
+                                            <v-icon x-large>link</v-icon>
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content> 
+                                            <v-list-tile-title>  Ссылка: </v-list-tile-title>
+                                            <v-list-tile-sub-title><span class="grey--text text--darken-2">[[ selected.url ]]</span></v-list-tile-sub-title>
+                                        </v-list-tile-content>                                        
+                                    </v-list-tile>
+                                </v-list>
+                            </v-bottom-sheet>
+                        </div>
+                    </template>
                 </main>
+
                 <v-btn fab bottom right color="red" dark fixed @click.stop="createDialog = !createDialog">
                     <v-icon>add</v-icon>
                 </v-btn>

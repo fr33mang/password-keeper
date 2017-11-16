@@ -5,6 +5,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from flask_login import LoginManager
+from flask_jwt_extended import JWTManager, jwt_required
 from config import config
 
 bootstrap = Bootstrap()
@@ -35,7 +36,10 @@ def create_app(config_name):
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .auth import auth
+    from .auth import auth, jwt_auth
     app.register_blueprint(auth)
+    app.register_blueprint(jwt_auth)
+
+    jwt = JWTManager(app)
 
     return app
