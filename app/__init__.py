@@ -36,7 +36,7 @@ def create_app(config_name):
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .auth import auth, jwt_auth
+    from .auth import auth, jwt_auth, jwt_views
     app.register_blueprint(auth)
     app.register_blueprint(jwt_auth)
 

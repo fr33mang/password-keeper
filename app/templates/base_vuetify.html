@@ -7,7 +7,7 @@
 
     {% block head %}
         <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-        <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+        <link href="https://unpkg.com/vuetify@0.17.1/dist/vuetify.min.css" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
         <script src="{{ url_for('static', filename='random.js') }}"></script>
@@ -22,7 +22,7 @@
     {% block application %}
         <div id="app">
             <v-app id="inspire">
-                <v-navigation-drawer temporary clipped app v-model="drawer">
+                <v-navigation-drawer temporary clipped app fixed v-model="drawer">
                     <v-list dense>
                         <template v-for="(item, i) in items">
                             <v-layout row v-if="item.heading" align-center :key="i">
@@ -70,7 +70,7 @@
                         </template>
                     </v-list>
                 </v-navigation-drawer>
-                <v-toolbar color="blue darken-3" dark app clipped-left fixed>
+                <v-toolbar color="blue darken-3" dark app clipped-left>
                     <v-toolbar-title style="max-width: 300px" class="ml-0 pl-3">
                         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                         Password keeper
@@ -83,9 +83,9 @@
                     </v-btn>
                 </v-toolbar>
                 <main>
-                    <v-container fluid fill-height ><!--class="no-padding"-->
-                        <v-flex hidden-xs-only align-center justify-center>
-                            <v-layout justify-center align-center>
+                    <v-container mt-1 fluid class="no-padding"><!--class="no-padding"-->
+                        <v-layout mt-1>
+                            <v-flex mt-1 hidden-xs-only>
                                 <template>
                                     <v-data-table v-bind:headers="headers" 
                                                 v-bind:items="passwords" 
@@ -100,22 +100,22 @@
                                         </template>
                                     </v-data-table>
                                 </template>
-                            </v-layout>
-                        </v-flex>
+                            </v-flex>
 
-                        <v-flex hidden-sm-and-up>
-                            <v-list two-line>
-                                <template v-for="item in passwords">
-                                    <v-list-tile @click="checkMasterPassword(showPassword, [[ item.id ]])">
-                                        <v-list-tile-content>
-                                            <v-list-tile-title v-html="item.title"></v-list-tile-title>
-                                            <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
-                                        </v-list-tile-content>
-                                    </v-list-tile>
-                                    <v-divider></v-divider>                                    
-                                </template>
-                            </v-list>
-                        </v-flex>
+                            <v-flex hidden-sm-and-up>
+                                <v-list two-line>
+                                    <template v-for="item in passwords">
+                                        <v-list-tile @click="checkMasterPassword(showPassword, [[ item.id ]])">
+                                            <v-list-tile-content>
+                                                <v-list-tile-title v-html="item.title"></v-list-tile-title>
+                                                <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
+                                            </v-list-tile-content>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>                                    
+                                    </template>
+                                </v-list>
+                            </v-flex>
+                        </v-layout>
                     </v-container>
                     
                     <template>
@@ -302,8 +302,8 @@
         </div>
     {% endblock application %}
     
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify@0.17.1/dist/vuetify.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     {% block vue_application %}
@@ -422,6 +422,11 @@
                             })
                             .catch(e => {
                                 console.log(e)
+                                if (e.response) {
+                                    if (e.status = 401) {
+                                        window.location.href= '/login'
+                                    }
+                                }
                             })
                     },
                     updatePassword: function () {

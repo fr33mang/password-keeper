@@ -9,7 +9,6 @@ from . import main
 #from .forms import NameForm
 
 @main.route('/', methods=['GET', 'POST'])
-@jwt_required
 def index():
     return render_template('index.html')
 

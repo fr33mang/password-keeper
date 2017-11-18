@@ -5,93 +5,89 @@
 {% block application %}
     <div id="app">
         <v-app>
-            <main>
-                <v-content>
-                    <v-container v-show="login" fluid fill-height>
-                        <v-layout align-center justify-center>
-                            <v-flex md4>
-                                {% for message in get_flashed_messages() %}
-                                    <v-alert color="error" icon="warning" value="true">
-                                        {{ message }}
-                                    </v-alert>
-                                {% endfor %}
+            <v-content>
+                <v-container v-show="login" fluid fill-height>
+                    <v-layout align-center justify-center>
+                        <v-flex md4>
+                            <v-alert color="error" v-show="login_alert" icon="warning" value="true">
+                                [[ login_message ]]
+                            </v-alert>
 
-                                <v-form v-model="loginFormValid">
+                            <v-form v-model="loginFormValid">
 
-                                    <v-text-field 
-                                        label="Email" 
-                                        v-model="loginCredentials.username" 
-                                        :rules="emailRules" 
-                                        required>
-                                    </v-text-field>
-                                    
-                                    <v-text-field 
-                                        name="input-10-1" 
-                                        label="Пароль" 
-                                        v-model="loginCredentials.password" 
-                                        :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
-                                        :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
-                                        :type="passFieldHidden ? 'password' : 'text'" 
-                                        counter
-                                        required>
-                                    </v-text-field>
+                                <v-text-field 
+                                    label="Email" 
+                                    v-model="loginCredentials.username" 
+                                    :rules="emailRules" 
+                                    required>
+                                </v-text-field>
+                                
+                                <v-text-field 
+                                    name="input-10-1" 
+                                    label="Пароль" 
+                                    v-model="loginCredentials.password" 
+                                    :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
+                                    :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
+                                    :type="passFieldHidden ? 'password' : 'text'" 
+                                    counter
+                                    required>
+                                </v-text-field>
 
-                                    <v-btn  :disabled="!loginFormValid" @click="DoLogin">
-                                        Войти
-                                    </v-btn>
+                                <v-btn  :disabled="!loginFormValid" @click="DoLogin">
+                                    Войти
+                                </v-btn>
 
-                                    <v-btn flat @click="login = !login">
-                                        Регистрация
-                                    </v-btn>
-                                </v-form>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
+                                <v-btn flat @click="login = !login">
+                                    Регистрация
+                                </v-btn>
+                            </v-form>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
 
-                    <v-container v-show="!login" fluid fill-height>
-                        <v-layout align-center justify-center>
-                            <v-flex md4>
-                                <v-form v-model="registerFormValid">
-                                    <v-text-field 
-                                        name="email"
-                                        label="Email" 
-                                        v-model="registerCredentials.email" 
-                                        :rules="emailRules" 
-                                        required></v-text-field>
-                                    
-                                    <v-text-field 
-                                        name="username"
-                                        label="Имя пользователя" 
-                                        v-model="registerCredentials.username" 
-                                        required>
-                                    </v-text-field>
+                <v-container v-show="!login" fluid fill-height>
+                    <v-layout align-center justify-center>
+                        <v-flex md4>
+                            <v-form v-model="registerFormValid">
+                                <v-text-field 
+                                    name="email"
+                                    label="Email" 
+                                    v-model="registerCredentials.email" 
+                                    :rules="emailRules" 
+                                    required></v-text-field>
+                                
+                                <v-text-field 
+                                    name="username"
+                                    label="Имя пользователя" 
+                                    v-model="registerCredentials.username" 
+                                    required>
+                                </v-text-field>
 
-                                    <v-text-field 
-                                        name="password" 
-                                        label="Пароль" 
-                                        hint="Как минимум 8 символов" 
-                                        v-model="registerCredentials.password" 
-                                        min="8" 
-                                        :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
-                                        :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
-                                        :type="passFieldHidden ? 'password' : 'text'" 
-                                        counter 
-                                        required>
-                                    </v-text-field>
-                                    
-                                    <v-btn :disabled="!registerFormValid" @click="DoRegister">
-                                        Регистрация
-                                    </v-btn>
-                                    
-                                    <v-btn @click="login = !login">
-                                        Есть учетная запись
-                                    </v-btn>
-                                </v-form>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-content>
-            </main>
+                                <v-text-field 
+                                    name="password" 
+                                    label="Пароль" 
+                                    hint="Как минимум 8 символов" 
+                                    v-model="registerCredentials.password" 
+                                    min="8" 
+                                    :append-icon="passFieldHidden ? 'visibility' : 'visibility_off'"
+                                    :append-icon-cb="() => (passFieldHidden = !passFieldHidden)" 
+                                    :type="passFieldHidden ? 'password' : 'text'" 
+                                    counter 
+                                    required>
+                                </v-text-field>
+                                
+                                <v-btn :disabled="!registerFormValid" @click="DoRegister">
+                                    Регистрация
+                                </v-btn>
+                                
+                                <v-btn @click="login = !login">
+                                    Есть учетная запись
+                                </v-btn>
+                            </v-form>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-content>
         </v-app>
     </div>
 {% endblock application %}
@@ -107,6 +103,8 @@
                 loginFormValid: false,
                 registerFormValid: false,
                 login: true,
+                login_alert: false,
+                login_message: "",
                 loginCredentials: {
                     username: "",
                     password: "",
@@ -130,11 +128,14 @@
                     .then(response => {
                             console.log(response)
                             console.log(response.data.access_token)
-                            window.localStorage.setItem("access_token", response.data.access_token)
                             window.location.href = "/"
                         })
                         .catch(e => {
                             console.log(e)
+                            if (e.response) {
+                                this.login_alert = true
+                                this.login_message = e.response.data["msg"]
+                            }
                         })
 
                 },
