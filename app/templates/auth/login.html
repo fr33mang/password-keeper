@@ -33,7 +33,7 @@
                                     required>
                                 </v-text-field>
 
-                                <v-btn  :disabled="!loginFormValid" @click="DoLogin">
+                                <v-btn  :disabled="!loginFormValid" @click="doLogin">
                                     Войти
                                 </v-btn>
 
@@ -76,7 +76,7 @@
                                     required>
                                 </v-text-field>
                                 
-                                <v-btn :disabled="!registerFormValid" @click="DoRegister">
+                                <v-btn :disabled="!registerFormValid" @click="doRegister">
                                     Регистрация
                                 </v-btn>
                                 
@@ -113,14 +113,19 @@
                     username: "",
                     email: "",
                     password: "",
-                    password2: "",
                 },
                 emailRules: [
                     (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Введите валидный email'
                 ],
             },
             methods: {
-                DoLogin: function () {
+                doubleHash: function (text) {
+                    return Sha256.hash(Sha256.hash(text))
+                },
+
+                doLogin: function () {
+                    this.loginCredentials.password = this.doubleHash(this.loginCredentials.password)
+
                     axios.post(
                         "/token/auth",
                         this.loginCredentials 
@@ -139,7 +144,10 @@
                         })
 
                 },
-                DoRegister: function () {
+
+                doRegister: function () {
+                    this.registerCredentials.password = this.doubleHash(this.registerCredentials.password)
+
                     axios.post(
                         "/register",
                         this.registerCredentials
@@ -151,7 +159,7 @@
                         .catch(e => {
                             console.log(e)
                         })
-                },
+                }
             },
         })
     </script>

@@ -51,16 +51,3 @@ def change_password():
         else:
             flash('Invalid password.')
     return render_template("auth/change_password.html", form=form)
-
-@auth.route('/check-master-password', methods=['POST'])
-@login_required
-def check_master_password():
-    json = request.get_json()
-    
-    master_password_hash = json['master_password_hash']
-    
-    if not current_user.verify_password(master_password_hash):
-      return jsonify({ "status": "invalid_master_password" }), 403
-
-    return jsonify({ "status": "ok"})
-

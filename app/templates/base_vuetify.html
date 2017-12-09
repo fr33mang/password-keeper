@@ -13,6 +13,7 @@
         <script src="{{ url_for('static', filename='random.js') }}"></script>
         <script src="{{ url_for('static', filename='aes.js') }}"></script>
         <script src="{{ url_for('static', filename='api.js') }}"></script>
+        <script src="{{ url_for('static', filename='sha256.js') }}"></script>
     {% endblock %}
     
 </head>
@@ -381,6 +382,10 @@
                 },
 
                 methods: {
+                    doubleHash: function (text) {
+                        return Sha256.hash(Sha256.hash(text))
+                    },
+
                     createPassword: function () {
                         if (!this.masterPassword) {
                             this.snackbar.text = "Введите мастер-пароль и повторите операцию!"
@@ -389,8 +394,11 @@
                         } else {
                             this.createDialog = false;
 
-                            this.newPassword.master_password_hash = this.masterPassword
-                            this.newPassword.password = cryptico.encryptAESCBC(this.newPassword.password, this.masterPassword)
+                            this.newPassword.master_password_hash = this.doubleHash(this.masterPassword)
+                            this.newPassword.password = cryptico.encryptAESCBC(
+                                                                        this.newPassword.password, 
+                                                                        Sha256.hash(this.masterPassword)
+                                                                            )
 
                             axios.post(
                                 '/storage',
@@ -437,8 +445,11 @@
                             this.masterPasswordCallback = callback
                             this.masterPasswordCallbackParams = arguments
                         } else {
-                            this.selected.master_password_hash = this.masterPassword
-                            this.selected.password = cryptico.encryptAESCBC(this.selected.password, this.masterPassword)
+                            this.selected.master_password_hash = this.doubleHash(this.masterPassword)
+                            this.selected.password = cryptico.encryptAESCBC(
+                                                                        this.selected.password, 
+                                                                        Sha256.hash(this.masterPassword)
+                                                                            )
 
                             axios.put(
                                 '/storage',
@@ -447,7 +458,10 @@
                                 .then(response => {
                                     console.log(response)
                                     this.editDialog = false;
-                                    this.selected.password = cryptico.decryptAESCBC(this.selected.password, this.masterPassword)
+                                    this.selected.password = cryptico.decryptAESCBC(
+                                                                                this.selected.password, 
+                                                                                Sha256.hash(this.masterPassword)
+                                                                                    )
                                     this.snackbar.color = "primary"
                                     this.snackbar.text = "Пароль успешно обновлен!"
                                     this.showSnackbar = true
@@ -485,7 +499,10 @@
                         } else {
                             if (!this.passwordsDectypted) {
                                 this.passwords.forEach( (p) => {
-                                    p.password = cryptico.decryptAESCBC(p.password, this.masterPassword)
+                                    p.password = cryptico.decryptAESCBC(
+                                                                    p.password, 
+                                                                    Sha256.hash(this.masterPassword)
+                                                                        )       
                                 })
 
                                 this.passwordsDectypted = true
@@ -510,7 +527,7 @@
                             this.masterPasswordCallbackParams = arguments[1]
                         } else {
                             axios.post("/check-master-password", {
-                                "master_password_hash": this.masterPassword
+                                "master_password_hash": this.doubleHash(this.masterPassword)
                             })
                                 .then(response => {
                                     this.masterPasswordDialog = false
@@ -533,7 +550,7 @@
             })
         </script>
     {% endblock vue_application %}
-     
+
 </body>
 
 </html>

@@ -45,3 +45,17 @@ def logout():
     resp = jsonify({'logout': True})
     unset_jwt_cookies(resp)
     return resp, 200
+
+
+@jwt_auth.route('/check-master-password', methods=['POST'])
+@jwt_required
+def check_master_password():
+    username = get_jwt_identity()
+    user = User.query.filter_by(email=username).first()
+
+    master_password_hash = request.json.get('master_password_hash')
+
+    if not user.verify_password(master_password_hash):
+        return jsonify({"status": "invalid_master_password"}), 403
+    
+    return jsonify({"status": "ok"})
