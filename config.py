@@ -14,7 +14,7 @@ class Config:
     #JWT_ACCESS_COOKIE_PATH = '/auth'
     JWT_RESRESH_PATH = '/token/refresh'
     JWT_COOKIE_CSRF_PROTECT = False
-    JWT_SECRET_KEY = 'SUPER_SECRET_KEY'
+    JWT_SECRET_KEY = SECRET_KEY
     #MAIL_SERVER = 'smtp.googlemail.com'
     #MAIL_PORT = 587
     #MAIL_USE_TLS = True
